@@ -2,21 +2,18 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
 interface IBlurredImage {
-    // width: string;
-    // height: string;
     loaded: boolean;
 }
 
 const BlurredSmallImage = styled.img<IBlurredImage>`
-  filter: ${props => (!props.loaded ? "blur(3px)" : "unset")};
-//   width: ${props => props.width};
-//   height: ${props => props.height};
+  flex-shrink: 0;
+  cursor: pointer;
+  background-size: cover;
   transition: filter 1s ease;
   background-position: 50% 50%;
   background-origin: border-box;
-  background-size: cover;
-  flex-shrink: 0;
-  cursor: pointer;
+  background-color: whitesmoke;
+  filter: ${props => (!props.loaded ? "blur(3px)" : "unset")};
 `;
 
 const imgShadow = new Image();
@@ -26,17 +23,15 @@ const isImageCached = (image: string) => {
     return imgShadow.complete;
 };
 
-const THUMBS_PATH = "/20";
-const IMAGES_PATH = "/1920";
-
-export const LazyBlurLoad = ({ path, image, ...props }: any) => {
-    const finalImgURI = path + IMAGES_PATH + image;
-    const isLoaded = isImageCached(finalImgURI);
+export const LazyBlurLoad = ({ src, ...props }: any) => {
+    const isLoaded = isImageCached(src);
 
     const [loadState, setLoadState] = useState({
-        src: isLoaded ? finalImgURI : path + THUMBS_PATH + image,
+        src: src,
         loaded: isLoaded
     });
+
+    console.log(loadState.src);
 
     useEffect(() => {
         if (!isLoaded) {
@@ -47,7 +42,7 @@ export const LazyBlurLoad = ({ path, image, ...props }: any) => {
                     loaded: true
                 });
             };
-            img.src = finalImgURI;
+            img.src = src;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -55,7 +50,6 @@ export const LazyBlurLoad = ({ path, image, ...props }: any) => {
     return (
         <BlurredSmallImage
             {...props}
-            // srl_gallery_image="true"
             src={loadState.src}
             loaded={loadState.loaded}
         />
